@@ -1,0 +1,107 @@
+#include <iostream>
+#include <string>
+
+// Загальний інтерфейс для телефону
+class Phone {
+public:
+    virtual void displayInfo() const = 0;
+    virtual ~Phone() = default;
+};
+
+// Загальний інтерфейс для ноутбука
+class Laptop {
+public:
+    virtual void displayInfo() const = 0;
+    virtual ~Laptop() = default;
+};
+
+// Абстрактна фабрика
+class ElectronicFactory {
+public:
+    virtual Phone* createPhone() = 0;
+    virtual Laptop* createLaptop() = 0;
+    virtual ~ElectronicFactory() = default;
+};
+
+// Конкретна фабрика для продуктів Samsung
+class SamsungFactory : public ElectronicFactory {
+public:
+    Phone* createPhone() override {
+        return new SamsungPhone();
+    }
+
+    Laptop* createLaptop() override {
+        return new SamsungLaptop();
+    }
+};
+
+// Конкретна фабрика для продуктів Apple
+class AppleFactory : public ElectronicFactory {
+public:
+    Phone* createPhone() override {
+        return new ApplePhone();
+    }
+
+    Laptop* createLaptop() override {
+        return new AppleLaptop();
+    }
+};
+
+// Продукти Samsung
+class SamsungPhone : public Phone {
+public:
+    void displayInfo() const override {
+        std::cout << "Samsung Phone" << std::endl;
+    }
+};
+
+class SamsungLaptop : public Laptop {
+public:
+    void displayInfo() const override {
+        std::cout << "Samsung Laptop" << std::endl;
+    }
+};
+
+// Продукти Apple
+class ApplePhone : public Phone {
+public:
+    void displayInfo() const override {
+        std::cout << "Apple Phone" << std::endl;
+    }
+};
+
+class AppleLaptop : public Laptop {
+public:
+    void displayInfo() const override {
+        std::cout << "Apple Laptop" << std::endl;
+    }
+};
+
+// Клієнтський код
+void clientCode(ElectronicFactory& factory) {
+    // Використання фабрики для створення телефону та ноутбука
+    Phone* phone = factory.createPhone();
+    Laptop* laptop = factory.createLaptop();
+
+    // Виклик методів продуктів
+    phone->displayInfo();
+    laptop->displayInfo();
+
+    // Звільнення ресурсів
+    delete phone;
+    delete laptop;
+}
+
+int main() {
+    // Використання конкретних фабрик
+    SamsungFactory samsungFactory;
+    AppleFactory appleFactory;
+
+    std::cout << "Samsung Products:" << std::endl;
+    clientCode(samsungFactory);
+
+    std::cout << "\nApple Products:" << std::endl;
+    clientCode(appleFactory);
+
+    return 0;
+}
