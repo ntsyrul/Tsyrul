@@ -1,0 +1,129 @@
+#include <iostream>
+#include <string>
+
+// Загальний інтерфейс для телефону
+class Phone {
+public:
+    virtual void displayInfo() const = 0;
+    virtual ~Phone() = default;
+};
+
+// Загальний інтерфейс для ноутбука
+class Laptop {
+public:
+    virtual void displayInfo() const = 0;
+    virtual ~Laptop() = default;
+};
+
+// Абстрактна фабрика
+class ElectronicFactory {
+private:
+    // Приватне статичне поле для одинака (лінива ініціалізація)
+    static ElectronicFactory* instance;
+
+protected:
+    ElectronicFactory() = default;
+
+public:
+    // Статичний створюючий метод
+    static ElectronicFactory* getInstance() {
+        if (!instance) {
+            instance = new ElectronicFactory();
+        }
+        return instance;
+    }
+
+    // Фабричні методи для створення телефону та ноутбука
+    virtual Phone* createPhone() = 0;
+    virtual Laptop* createLaptop() = 0;
+
+    virtual ~ElectronicFactory() {
+        // Звільнення ресурсів при завершенні програми
+        delete instance;
+    }
+};
+
+// Конкретна фабрика для продуктів Samsung
+class SamsungFactory : public ElectronicFactory {
+public:
+    Phone* createPhone() override {
+        return new SamsungPhone();
+    }
+
+    Laptop* createLaptop() override {
+        return new SamsungLaptop();
+    }
+};
+
+// Конкретна фабрика для продуктів Apple
+class AppleFactory : public ElectronicFactory {
+public:
+    Phone* createPhone() override {
+        return new ApplePhone();
+    }
+
+    Laptop* createLaptop() override {
+        return new AppleLaptop();
+    }
+};
+
+// Продукти Samsung
+class SamsungPhone : public Phone {
+public:
+    void displayInfo() const override {
+        std::cout << "Samsung Phone" << std::endl;
+    }
+};
+
+class SamsungLaptop : public Laptop {
+public:
+    void displayInfo() const override {
+        std::cout << "Samsung Laptop" << std::endl;
+    }
+};
+
+// Продукти Apple
+class ApplePhone : public Phone {
+public:
+    void displayInfo() const override {
+        std::cout << "Apple Phone" << std::endl;
+    }
+};
+
+class AppleLaptop : public Laptop {
+public:
+    void displayInfo() const override {
+        std::cout << "Apple Laptop" << std::endl;
+    }
+};
+
+// Ініціалізація статичного поля
+ElectronicFactory* ElectronicFactory::instance = nullptr;
+
+// Клієнтський код
+void clientCode(ElectronicFactory& factory) {
+    // Використання фабрики для створення телефону та ноутбука
+    Phone* phone = factory.createPhone();
+    Laptop* laptop = factory.createLaptop();
+
+    // Виклик методів продуктів
+    phone->displayInfo();
+    laptop->displayInfo();
+
+    // Звільнення ресурсів
+    delete phone;
+    delete laptop;
+}
+
+int main() {
+    // Використання створюючого методу одинака
+    ElectronicFactory* factory = ElectronicFactory::getInstance();
+
+    std::cout << "Samsung Products:" << std::endl;
+    clientCode(*factory);
+
+    // Звільнення ресурсів під час завершення програми
+    delete factory;
+
+    return 0;
+}
