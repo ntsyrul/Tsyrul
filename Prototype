@@ -1,0 +1,83 @@
+#include <iostream>
+#include <unordered_map>
+
+// Інтерфейс прототипу
+class Prototype {
+public:
+    virtual Prototype* clone() const = 0;
+    virtual void info() const = 0;
+    virtual ~Prototype() = default;
+};
+
+// Конкретний клас прототипу
+class ConcretePrototype : public Prototype {
+private:
+    int data;
+
+public:
+    ConcretePrototype(int data) : data(data) {}
+
+    // Альтернативний конструктор для клонування
+    ConcretePrototype(const ConcretePrototype& other) : data(other.data) {}
+
+    // Метод клонування
+    Prototype* clone() const override {
+        return new ConcretePrototype(*this);
+    }
+
+    void info() const override {
+        std::cout << "ConcretePrototype: " << data << std::endl;
+    }
+};
+
+// Центральне сховище прототипів
+class PrototypeFactory {
+private:
+    std::unordered_map<std::string, Prototype*> prototypes;
+
+public:
+    // Додавання прототипу до сховища
+    void addPrototype(const std::string& key, Prototype* prototype) {
+        prototypes[key] = prototype;
+    }
+
+    // Отримання клону прототипу за ключем
+    Prototype* createClone(const std::string& key) const {
+        auto it = prototypes.find(key);
+        if (it != prototypes.end()) {
+            return it->second->clone();
+        }
+        return nullptr;
+    }
+
+    ~PrototypeFactory() {
+        // Звільнення ресурсів при завершенні програми
+        for (auto& pair : prototypes) {
+            delete pair.second;
+        }
+    }
+};
+
+int main() {
+    // Створення центрального сховища прототипів
+    PrototypeFactory factory;
+
+    // Додавання прототипів до сховища
+    factory.addPrototype("first", new ConcretePrototype(1));
+    factory.addPrototype("second", new ConcretePrototype(2));
+
+    // Використання прототипу через клонування
+    Prototype* clone1 = factory.createClone("first");
+    if (clone1) {
+        clone1->info();
+        delete clone1;
+    }
+
+    Prototype* clone2 = factory.createClone("second");
+    if (clone2) {
+        clone2->info();
+        delete clone2;
+    }
+
+    return 0;
+}
