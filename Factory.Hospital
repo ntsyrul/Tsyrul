@@ -1,1 +1,43 @@
-в
+#include <iostream>
+
+// Клієнтський інтерфейс
+class HospitalClientInterface {
+public:
+    virtual std::string requestService(int patientId) = 0;
+};
+
+// Адаптер
+class HospitalServiceAdapter : public HospitalClientInterface {
+private:
+    // Посилання на об'єкт службового класу
+    HospitalService* hospitalService;
+
+public:
+    HospitalServiceAdapter(HospitalService* service) : hospitalService(service) {}
+
+    // Реалізація клієнтського інтерфейсу через делегування службовому класу
+    std::string requestService(int patientId) override {
+        // Делегуємо основну роботу сервісу
+        std::string result = hospitalService->servePatient(patientId);
+        // Додаткові операції адаптації, якщо потрібно
+        return result;
+    }
+};
+
+// Службовий клас
+class HospitalService {
+public:
+    std::string servePatient(int patientId) {
+        // Реалізація службового методу
+        return "Serving patient with ID " + std::to_string(patientId);
+    }
+};
+
+// Використання адаптера через клієнтський інтерфейс
+int main() {
+    HospitalServiceAdapter adapter(new HospitalService());
+    std::string result = adapter.requestService(123);
+    std::cout << result << std::endl;
+
+    return 0;
+}
