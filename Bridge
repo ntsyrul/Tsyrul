@@ -1,0 +1,110 @@
+#include <iostream>
+#include <string>
+
+// Базовий клас абстракції
+class PlatformAbstraction {
+public:
+    virtual void drawText(const std::string& text) = 0;
+    virtual void drawGraphics(const std::string& image) = 0;
+    virtual ~PlatformAbstraction() = default;
+};
+
+// Конкретна реалізація для платформи Windows
+class WindowsPlatform : public PlatformAbstraction {
+public:
+    void drawText(const std::string& text) override {
+        std::cout << "Drawing text on Windows: " << text << std::endl;
+    }
+
+    void drawGraphics(const std::string& image) override {
+        std::cout << "Drawing graphics on Windows: " << image << std::endl;
+    }
+};
+
+// Конкретна реалізація для платформи Linux
+class LinuxPlatform : public PlatformAbstraction {
+public:
+    void drawText(const std::string& text) override {
+        std::cout << "Drawing text on Linux: " << text << std::endl;
+    }
+
+    void drawGraphics(const std::string& image) override {
+        std::cout << "Drawing graphics on Linux: " << image << std::endl;
+    }
+};
+
+// Конкретна реалізація для платформи Mac
+class MacPlatform : public PlatformAbstraction {
+public:
+    void drawText(const std::string& text) override {
+        std::cout << "Drawing text on Mac: " << text << std::endl;
+    }
+
+    void drawGraphics(const std::string& image) override {
+        std::cout << "Drawing graphics on Mac: " << image << std::endl;
+    }
+};
+
+// Клас абстракції
+class Application {
+protected:
+    PlatformAbstraction* platform;
+
+public:
+    Application(PlatformAbstraction* impl) : platform(impl) {}
+
+    virtual void run() = 0;
+    virtual ~Application() = default;
+};
+
+// Підклас абстракції для текстового застосування
+class TextApplication : public Application {
+public:
+    TextApplication(PlatformAbstraction* impl) : Application(impl) {}
+
+    void run() override {
+        // Використання текстового інтерфейсу
+        platform->drawText("Hello, World!");
+    }
+};
+
+// Підклас абстракції для графічного застосування
+class GraphicsApplication : public Application {
+public:
+    GraphicsApplication(PlatformAbstraction* impl) : Application(impl) {}
+
+    void run() override {
+        // Використання графічного інтерфейсу
+        platform->drawGraphics("Awesome Image");
+    }
+};
+
+int main() {
+    // Створення об'єктів реалізації для кожної платформи
+    WindowsPlatform windowsImpl;
+    LinuxPlatform linuxImpl;
+    MacPlatform macImpl;
+
+    // Використання абстракції з реалізацією для Windows
+    TextApplication windowsTextApp(&windowsImpl);
+    windowsTextApp.run();
+
+    GraphicsApplication windowsGraphicsApp(&windowsImpl);
+    windowsGraphicsApp.run();
+
+    // Використання абстракції з реалізацією для Linux
+    TextApplication linuxTextApp(&linuxImpl);
+    linuxTextApp.run();
+
+    GraphicsApplication linuxGraphicsApp(&linuxImpl);
+    linuxGraphicsApp.run();
+
+    // Використання абстракції з реалізацією для Mac
+    TextApplication macTextApp(&macImpl);
+    macTextApp.run();
+
+    GraphicsApplication macGraphicsApp(&macImpl);
+    macGraphicsApp.run();
+
+    return 0;
+}
